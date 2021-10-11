@@ -29,8 +29,20 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
+      - name: set up JDK 16
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 16
+          architecture: x64
+      - name: Cache Maven packages
+        uses: actions/cache@v2.1.5
+        with:
+          path: ~/.m2
+          key: ubuntu-latest-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ubuntu-latest-m2
+      - name: Test with Maven
+        run: mvn install -DskipTests
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
